@@ -1,0 +1,13 @@
+.THIS {
+    max-width: 900px;
+    margin: 10px auto;
+}
+
+.THIS .wizard-step-body{
+    min-height: 300px;
+}
+
+.THIS .progress-indicator{
+    margin-bottom: 25px;
+    margin-top: -40px;
+}

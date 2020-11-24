@@ -1,0 +1,154 @@
+<aura:component description="ImportFileUpload" extends="c:vertic_WizardStep">
+
+    <!-- Attribute Overrides -->
+    <aura:set attribute="title" value="Upload Import File"/>
+    <aura:set attribute="hideContentOnBusy" value="{!false}"/>
+    <aura:set attribute="isDisabledNextBtn" value="{!v.isBusy}"/>
+
+
+    <!-- Attributes -->
+    <!--<aura:attribute name="meta" type="Map" required="{!true}"/>-->
+
+    <!-- Events -->
+    <aura:registerEvent name="onProgress" type="c:vertic_ComponentEvent"/>
+
+    <!-- Handlers -->
+    <aura:handler name="init" value="{!this}" action="{!c.handleInit}"/>
+    <aura:handler name="onProgress" event="c:vertic_ComponentEvent" action="{!c.handleOnProgress}"/>
+
+    <!-- Methods -->
+    <!-- <aura:method name="refresh" action="{!c.handleInit}"></aura:method> -->
+
+    <aura:set attribute="body">
+
+        <c:PapaParse aura:id="papaParseCmp"/>
+
+        <div class="slds-grid slds-gutters_small slds-p-horizontal__small slds-m-vertical_medium">
+            <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                <p>
+                    Drag and drop or search for the import file you wish to process. Please note, files must be .CSV format.
+                </p>
+            </div>
+        </div>
+
+        <div class="slds-grid slds-gutters_small slds-p-horizontal__small slds-m-vertical_medium">
+            <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                <lightning:input label="Upload"
+                                 aura:id="upload"
+                                 variant="label-hidden"
+                                 type="file"
+                                 accept=".csv"
+                                 multiple="{!false}"
+                                 onchange="{!c.handleFilesChange}"
+                                 disabled="{!v.isBusy}"
+                />
+            </div>
+        </div>
+
+        <div class="slds-grid slds-gutters_small slds-p-horizontal__small slds-m-vertical_medium">
+            <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                <!--                <aura:if isTrue="{!not(empty(v.meta.selectOptions.flowSettingOptions))}">-->
+                <c:vertic_Select label="Flow Setting"
+                                 aura:id="upload"
+                                 required="{!true}"
+                                 value="{!v.meta.dto.flowSetting}"
+                                 disabled="{!v.isBusy}"
+                                 options="{!v.meta.selectOptions.flowSettingOptions}"
+                />
+                <!--                </aura:if>-->
+            </div>
+        </div>
+
+        <aura:if isTrue="{!v.meta.dto.csvParsedData}">
+            <div class="slds-grid slds-gutters_small slds-p-horizontal__small slds-m-vertical_medium">
+                <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                    Number of rows to be processed: <strong>{!v.meta.dto.csvParsedData.data.length}</strong>
+                </div>
+            </div>
+
+            <aura:if isTrue="{!v.meta.dto.csvParsedData.errors.length}">
+                <div class="slds-grid slds-gutters_small slds-p-horizontal__small slds-m-vertical_medium">
+                    <div class="slds-col slds-has-flexi-truncate slds-text-color_error" role="listitem">
+                        Number of errors: <strong>{!v.meta.dto.csvParsedData.errors.length}</strong>
+                    </div>
+                </div>
+
+                <div class="slds-grid slds-gutters_small slds-p-horizontal__small slds-m-vertical_medium">
+                    <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                        <lightning:accordion aura:id="accordion" activeSectionName="A" allowMultipleSectionsOpen="true">
+                            <lightning:accordionSection name="B" label="Errors">
+                                <table class="slds-table slds-table_bordered slds-no-row-hover">
+                                    <thead>
+                                    <tr class="slds-line-height_reset">
+                                        <th class="" scope="col" width="85%">
+                                            <div class="slds-truncate" title="Error">Error</div>
+                                        </th>
+                                        <th class="" scope="col">
+                                            <div class="slds-truncate" title="Row">Row</div>
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <aura:iteration items="{!v.meta.dto.csvParsedData.errors}" var="error">
+                                        <tr class="slds-hint-parent">
+                                            <th data-label="Opportunity Name" scope="row">
+                                                <div class="slds-truncate" title="{#error.message}">
+                                                    {#error.message}
+                                                </div>
+                                            </th>
+                                            <td data-label="Account Name">
+                                                <div class="slds-truncate">
+                                                    {#error.row}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </aura:iteration>
+                                    </tbody>
+                                </table>
+                            </lightning:accordionSection>
+                        </lightning:accordion>
+                    </div>
+                </div>
+            </aura:if>
+
+
+            <div class="slds-grid slds-gutters_small slds-p-horizontal__small slds-m-v_x-large">
+                <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                    <br/>
+                    <lightning:input label="Check Only"
+                                     disabled="{!v.isBusy}"
+                                     checked="{!v.meta.dto.checkOnly}"
+                                     type="checkbox"
+                    />
+                </div>
+                <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                    <br/>
+                    <lightning:input label="Allow Parallel"
+                                     aura:id="upload"
+                                     type="checkbox"
+                                     checked="{!v.meta.dto.isParallel}"
+                                     disabled="{!v.isBusy}"
+                    />
+                </div>
+            </div>
+
+            <aura:if isTrue="{!v.meta.dto.progress.isVisible}">
+                <div class="slds-grid slds-gutters_small slds-p-horizontal__small slds-m-v_x-large">
+                    <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                        <br/>
+                        <lightning:progressBar value="{!v.meta.dto.progress.value}"/>
+                        <br/>
+                        <p class="slds-text-align_center">{!v.meta.dto.progress.value}% ({!v.meta.dto.progress.current} of {!v.meta.dto.progress.total})</p>
+                        <br/>
+                        Started: <lightning:relativeDateTime value="{!v.meta.dto.progress.startedOn}"/>
+                        <br/>
+                        <br/>
+                    </div>
+                </div>
+            </aura:if>
+
+        </aura:if>
+
+    </aura:set>
+
+</aura:component>
