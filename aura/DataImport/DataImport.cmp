@@ -1,0 +1,57 @@
+<aura:component description="DataImport" extends="c:vertic_Base" implements="force:appHostable">
+
+    <!-- Attribute Overrides -->
+    <aura:set attribute="hideContentOnBusy" value="{!false}"/>
+    <aura:set attribute="meta" value='{"dto":{"checkOnly": false}}'/>
+
+
+    <!-- Attributes -->
+    <aura:attribute name="currentStep" type="String" default="ImportFileUpload"/>
+
+    <!-- Events -->
+    <!-- <aura:registerEvent name="onSuccess" type="c:vertic_ComponentEvent"/>-->
+
+    <!-- Handlers -->
+    <aura:handler name="init" value="{!this}" action="{!c.handleInit}"/>
+
+    <!-- Methods -->
+    <!-- <aura:method name="refresh" action="{!c.handleInit}"></aura:method> -->
+
+    <lightning:card iconName="utility:upload" title="Data Import">
+
+        <c:vertic_Wizard aura:id="wizard"
+                         nextBtnClass="slds-float_right slds-button_brand"
+                         submitBtnClass="slds-float_right slds-button_brand"
+                         class="wizard slds-m-around_medium"
+                         variant="default"
+                         showNavigation="{!true}"
+                         onSubmit="{!c.handleSubmit}"
+                         currentStep="{!v.currentStep}">
+
+            <c:DataImportFileUpload meta="{!v.meta}"
+                                    isShowPreviousBtn="{!false}"
+                                    isDisabledNextBtn="{!v.isBusy}"
+                                    nextBtnLabel="Import"
+                                    name="ImportFileUpload"
+                                    isShowCancelBtn="{!true}"
+            />
+
+            <c:DataImportSummary meta="{!v.meta}"
+                                 aura:id="ImportSummary"
+                                 isShowNextBtn="{!false}"
+                                 isShowPreviousBtn="{!true}"
+                                 name="DataImportSummary"
+            />
+
+        </c:vertic_Wizard>
+
+
+        <lightning:progressIndicator currentStep="{!v.currentStep}" type="base" variant="base" class="progress-indicator">
+            <lightning:progressStep label="Upload Import File" value="ImportFileUpload"/>
+            <lightning:progressStep label="Import Results Summary" value="DataImportSummary"/>
+        </lightning:progressIndicator>
+
+    </lightning:card>
+
+
+</aura:component>

@@ -1,0 +1,57 @@
+<aura:component description="ImportSummary" extends="c:vertic_WizardStep">
+
+    <!-- Attribute Overrides -->
+    <aura:set attribute="title" value="Import Results Summary"/>
+    <aura:set attribute="hideContentOnBusy" value="{!false}"/>
+
+
+    <!-- Attributes -->
+    <!--<aura:attribute name="meta" type="Map" required="{!true}"/>-->
+
+    <!-- Events -->
+    <!-- <aura:registerEvent name="onSuccess" type="c:vertic_ComponentEvent"/>-->
+
+    <!-- Handlers -->
+    <!-- <aura:handler name="init" value="{!this}" action="{!c.handleInit}"/> -->
+
+    <!-- Methods -->
+    <!-- <aura:method name="refresh" action="{!c.handleInit}"></aura:method> -->
+
+    <aura:set attribute="body">
+
+        <c:vertic_CSVUtils aura:id="csvUtils"/>
+
+        <aura:if isTrue="{!and(v.isVisible, v.meta.dto.importSummary)}">
+            <div class="slds-grid slds-gutters_small slds-p-horizontal__small slds-m-vertical_medium">
+                <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                    Total Processed Rows: <strong>{!v.meta.dto.importSummary.totalProcessed}</strong>
+                </div>
+            </div>
+
+            <div class="slds-grid slds-gutters_small slds-p-horizontal__small slds-m-vertical_medium">
+                <div class="{!'slds-col slds-has-flexi-truncate' + if(v.meta.dto.importSummary.totalSucceeded > 0,' slds-text-color_success', '')}" role="listitem">
+                    Total Succeeded Rows: <strong>{!v.meta.dto.importSummary.totalSucceeded}</strong>
+                </div>
+            </div>
+
+            <div class="slds-grid slds-gutters_small slds-p-horizontal__small slds-m-vertical_medium">
+                <div class="{!'slds-col slds-has-flexi-truncate' + if(v.meta.dto.importSummary.totalFailed > 0,' slds-text-color_error', '')}" role="listitem">
+                    Total Failed Rows:    <strong>{!v.meta.dto.importSummary.totalFailed}</strong>
+                </div>
+            </div>
+
+            <aura:if isTrue="{!v.meta.dto.importSummary.totalFailed > 0}">
+                <div class="slds-grid slds-gutters_small slds-p-horizontal__small slds-m-vertical_medium">
+                    <div class="slds-col slds-has-flexi-truncate" role="listitem">
+                        <lightning:button label="Download Error Report"
+                                          onclick="{!c.handleDownloadErrorReport}"
+                        />
+                    </div>
+                </div>
+            </aura:if>
+
+        </aura:if>
+
+    </aura:set>
+
+</aura:component>
