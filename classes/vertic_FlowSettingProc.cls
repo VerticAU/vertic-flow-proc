@@ -29,7 +29,7 @@ public class vertic_FlowSettingProc extends vertic_FlowProc {
             this.flowSetting = new Flow_Setting__mdt();
             this.request.getMapper().mapToSObject('setting', this.flowSetting);
         } else {
-            this.retrieveCSVFlowSetting();
+            this.retrieveFlowSetting();
         }
 
         this.mapInputs();
@@ -42,7 +42,6 @@ public class vertic_FlowSettingProc extends vertic_FlowProc {
 
         try {
             super.process(request);
-            System.debug('RESPONSE: ' + this.response);
         } catch (Exception ex) {
             throw ex;
         } finally {
@@ -53,10 +52,10 @@ public class vertic_FlowSettingProc extends vertic_FlowProc {
 
     }
 
-    private void retrieveCSVFlowSetting() {
+    private void retrieveFlowSetting() {
 
-        String CSVFlowSettingId = this.request.getString('settingId');
-        String FlowSettingName = this.request.getString('settingName');
+        String flowSettingId = this.request.getString('settingId');
+        String flowSettingName = this.request.getString('settingName');
 
         fflib_QueryFactory queryFactory = new fflib_QueryFactory(Flow_Setting__mdt.SObjectType);
         queryFactory.selectFields(new Set<SObjectField>{
@@ -65,20 +64,20 @@ public class vertic_FlowSettingProc extends vertic_FlowProc {
             Flow_Setting__mdt.Output__c
         });
 
-        if (String.isNotBlank(CSVFlowSettingId)) {
-            queryFactory.setCondition('Id = :CSVFlowSettingId');
+        if (String.isNotBlank(flowSettingId)) {
+            queryFactory.setCondition('Id = :flowSettingId');
             this.flowSetting = (Flow_Setting__mdt) vertic_Utils.arrays.firstOrException(
                 Database.query(queryFactory.toSOQL()),
-                'No Flow_Setting__mdt with Id: ' + CSVFlowSettingId
+                'Flow Setting with Id ' + flowSettingId + ' not found.'
             );
-        } else if (String.isNotBlank(FlowSettingName)) {
-            queryFactory.setCondition('DeveloperName = :FlowSettingName');
+        } else if (String.isNotBlank(flowSettingName)) {
+            queryFactory.setCondition('DeveloperName = :flowSettingName');
             this.flowSetting = (Flow_Setting__mdt) vertic_Utils.arrays.firstOrException(
                 Database.query(queryFactory.toSOQL()),
-                'No Flow_Setting__mdt with API Name: ' + FlowSettingName
+                'Flow Setting with API Name ' + flowSettingName + ' not found.'
             );
         } else {
-            throw new vertic_Structs.MissingDataException('No Flow Setting parameter. Please use the "settingId" or "setting" to setup the Flow_Setting__mdt for processing.');
+            throw new vertic_Structs.MissingDataException('Flow Setting parameters are missing. Please use the "settingId", "settingName" or "setting" to init a Flow Setting for processing.');
         }
 
     }
@@ -89,13 +88,6 @@ public class vertic_FlowSettingProc extends vertic_FlowProc {
 
         Map<String, Object> mappedInputs = mapFlowInputs(inputsMap, flowSettingInputMap);
 
-        System.debug('inputsMap: ' + inputsMap);
-        System.debug('csvFlowMappings: ' + flowSettingInputMap);
-        System.debug('mappedInputs: ' + mappedInputs);
-
-//        hey.Logger.debug('mappedInputs');
-//        hey.Logger.debug(mappedInputs);
-
         this.request.put('inputs', mappedInputs);
     }
 
@@ -105,9 +97,6 @@ public class vertic_FlowSettingProc extends vertic_FlowProc {
         if(String.isNotBlank(outputStr)){
             outputVariables.addAll(outputStr.split(','));
         }
-
-        System.debug('outputVariables');
-        System.debug(outputVariables);
 
         this.request.put('outputFields', outputVariables);
     }
